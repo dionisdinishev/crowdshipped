@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>crowdshipped.dev — You Vote It. I Build It.</title>
+  <meta name="description" content="Community-driven app factory. Comment your app idea on Instagram, hit 100 likes, and I'll build it live. No winner in 21 days? New attempt.">
+  <meta property="og:title" content="crowdshipped.dev — You Vote It. I Build It.">
+  <meta property="og:description" content="Comment your app idea. Hit 100 likes. I build it live. No winner in 21 days? New attempt.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://crowdshipped.dev">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="logo-favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-card-hover: #1a1a26;
+      --surface: #16161f;
+      --border: #2a2a3a;
+      --text: #e8e8ed;
+      --text-dim: #8888a0;
+      --text-muted: #55556a;
+      --accent: #7f3eff;
+      --accent-bright: #b07aff;
+      --green: #00e676;
+      --green-dim: #00c853;
+      --orange: #ff9100;
+      --pink: #e581ff;
+      --cyan: #00e5ff;
+      --font-display: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-display);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ═══════ NOISE TEXTURE ═══════ */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ═══════ GLOW ORB ═══════ */
+    .glow-orb {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(127,62,255,0.12) 0%, transparent 70%);
+      top: -200px;
+      right: -200px;
+      pointer-events: none;
+      z-index: 0;
+      animation: float 8s ease-in-out infinite;
+    }
+    .glow-orb-2 {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,230,118,0.06) 0%, transparent 70%);
+      bottom: -150px;
+      left: -150px;
+      pointer-events: none;
+      z-index: 0;
+      animation: float 10s ease-in-out infinite reverse;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, 20px); }
+    }
+
+    /* ═══════ LAYOUT ═══════ */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ═══════ NAV ═══════ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 24px;
+      background: rgba(10,10,15,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--accent-bright); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent) !important;
+      color: #fff !important;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 600 !important;
+      transition: background 0.2s, transform 0.15s !important;
+    }
+    .nav-cta:hover { background: #9a5fff !important; transform: translateY(-1px); }
+
+    /* ═══════ HERO ═══════ */
+    .hero {
+      padding: 160px 0 100px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-weight: 500;
+      margin-bottom: 32px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+    .hero-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,230,118,0.4); }
+      50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(0,230,118,0); }
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.6s ease-out 0.1s both;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--accent-bright), var(--pink), #ff9100);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+      color: var(--text-dim);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      font-weight: 400;
+      line-height: 1.7;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.6s ease-out 0.3s both;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #9a5fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(127,62,255,0.3); }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: var(--bg-card-hover); border-color: var(--text-muted); transform: translateY(-2px); }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════ HOW IT WORKS ═══════ */
+    .how-it-works {
+      padding: 80px 0;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--accent-bright);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 48px;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .step {
+      position: relative;
+      padding: 28px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: all 0.3s;
+    }
+    .step:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+    .step-number {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--accent-bright);
+      background: rgba(127,62,255,0.15);
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+    .step-icon {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .step h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .step p {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    /* ═══════ CURRENTLY BUILDING ═══════ */
+    .building {
+      padding: 60px 0;
+    }
+    .building-card {
+      background: linear-gradient(135deg, rgba(127,62,255,0.1), rgba(229,129,255,0.05));
+      border: 1px solid rgba(127,62,255,0.3);
+      border-radius: 20px;
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .building-status {
+      flex-shrink: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+    }
+    .building-info { flex: 1; min-width: 250px; }
+    .building-info .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .building-info .tag .blink {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+      animation: pulse 1.5s infinite;
+    }
+    .building-info h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .building-info p {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    /* ═══════ APP GALLERY ═══════ */
+    .gallery {
+      padding: 80px 0;
+    }
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .app-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .app-card:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+    .app-card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .app-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+    .app-card-meta {
+      display: flex;
+      flex-direction: column;
+    }
+    .app-card-meta h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+    .app-card-meta span {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .app-card p {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      line-height: 1.55;
+      margin-bottom: 16px;
+    }
+    .app-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .app-card-author {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .app-card-author strong { color: var(--accent-bright); }
+    .app-card-tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(0,230,118,0.1);
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* empty state */
+    .empty-gallery {
+      text-align: center;
+      padding: 60px 20px;
+      border: 2px dashed var(--border);
+      border-radius: 20px;
+    }
+    .empty-gallery .icon { font-size: 3rem; margin-bottom: 16px; }
+    .empty-gallery h3 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .empty-gallery p {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* ═══════ CTA SECTION ═══════ */
+    .cta-section {
+      padding: 80px 0;
+    }
+    .cta-box {
+      text-align: center;
+      padding: 60px 40px;
+      background: linear-gradient(135deg, var(--surface), var(--bg-card));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(127,62,255,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .cta-box h2 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .cta-box p {
+      color: var(--text-dim);
+      font-size: 1rem;
+      margin-bottom: 28px;
+      max-width: 460px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+    }
+    .cta-box .btn-primary { position: relative; }
+
+    /* ═══════ CUSTOM SOLUTIONS ═══════ */
+    .custom {
+      padding: 60px 0;
+    }
+    .custom-card {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      padding: 36px 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      flex-wrap: wrap;
+    }
+    .custom-icon {
+      flex-shrink: 0;
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(127,62,255,0.15), rgba(229,129,255,0.1));
+      border: 1px solid rgba(127,62,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+    .custom-info { flex: 1; min-width: 250px; }
+    .custom-info h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+    }
+    .custom-info p {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: transparent;
+      color: var(--accent-bright);
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border: 1px solid var(--accent);
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-outline:hover {
+      background: rgba(127,62,255,0.1);
+      border-color: var(--accent-bright);
+      transform: translateY(-2px);
+    }
+
+    /* ═══════ FOOTER ═══════ */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    footer p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    footer a {
+      color: var(--accent-bright);
+      text-decoration: none;
+    }
+    footer a:hover { text-decoration: underline; }
+
+    /* ═══════ RESPONSIVE ═══════ */
+    @media (max-width: 768px) {
+      .hero { padding: 130px 0 60px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .building-card { padding: 28px; gap: 20px; }
+      .steps { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .steps { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-orb"></div>
+  <div class="glow-orb-2"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-logo"><span style="color:#7f3eff">&lt;</span><span>CS</span><span style="color:#e581ff">/&gt;</span> crowdshipped.dev</a>
+      <div class="nav-links">
+        <a href="#how">How It Works</a>
+        <a href="#apps">Apps</a>
+        <a href="https://instagram.com/crowdshipped.dev" target="_blank" class="nav-cta">Follow on IG</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        App #1 Attempt 1 — 21-Day Challenge
+      </div>
+      <h1>You vote it.<br><span class="gradient">I build it.</span></h1>
+      <p class="hero-sub">
+        Comment your app idea on Instagram. First to 100 likes gets built.
+        No winner in 21 days? New attempt. The race&nbsp;continues.
+      </p>
+      <div class="hero-actions">
+        <a href="https://instagram.com/crowdshipped.dev" target="_blank" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          Submit Your Idea
+        </a>
+        <a href="#apps" class="btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Browse Apps
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works" id="how">
+    <div class="container">
+      <p class="section-label">The Loop</p>
+      <h2 class="section-title">How it works</h2>
+      <div class="steps">
+        <div class="step">
+          <span class="step-number">01</span>
+          <span class="step-icon">💬</span>
+          <h3>Comment Your Idea</h3>
+          <p>Drop your app idea as a comment on the latest voting post. Any web tool, utility, or micro-app you wish existed.</p>
+        </div>
+        <div class="step">
+          <span class="step-number">02</span>
+          <span class="step-icon">🔥</span>
+          <h3>Hit 100 Likes</h3>
+          <p>First comment to hit 100 likes wins. No winner after 21 days? New attempt starts — the race resets but the goal stays.</p>
+        </div>
+        <div class="step">
+          <span class="step-number">03</span>
+          <span class="step-icon">🔄</span>
+          <h3>Or... New Attempt</h3>
+          <p>No comment hit 100 likes in 21 days? Attempt resets. Same app number, new round. The pressure builds each time.</p>
+        </div>
+        <div class="step">
+          <span class="step-number">04</span>
+          <span class="step-icon">🚀</span>
+          <h3>App Goes Live</h3>
+          <p>The winning idea gets built and shipped to its own subdomain. You get credited as the idea author.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CURRENTLY BUILDING -->
+  <section class="building">
+    <div class="container">
+      <div class="building-card">
+        <div class="building-status">🗳️</div>
+        <div class="building-info">
+          <div class="tag"><span class="blink"></span> Voting Open</div>
+          <h3>App #1 — Attempt 1</h3>
+          <p>21 days to hit 100 likes. No winner? We try again. Submit your idea and rally the community!</p>
+        </div>
+        <a href="https://instagram.com/crowdshipped.dev" target="_blank" class="btn-primary" style="flex-shrink:0;">
+          Vote Now
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP GALLERY -->
+  <section class="gallery" id="apps">
+    <div class="container">
+      <p class="section-label">The Collection</p>
+      <h2 class="section-title">Community-Built Apps</h2>
+
+      <!-- EMPTY STATE (replace with app-grid once apps are live) -->
+      <div class="empty-gallery">
+        <div class="icon">📦</div>
+        <h3>No apps shipped yet</h3>
+        <p>The first community-voted app is in the works. Follow on Instagram to be part of it from day one.</p>
+      </div>
+
+      <!--
+      ═══════════════════════════════════════════════
+      TEMPLATE: Copy this block for each new app
+      ═══════════════════════════════════════════════
+      <div class="app-grid">
+        <a href="https://app1.crowdshipped.dev" class="app-card">
+          <div class="app-card-header">
+            <div class="app-card-icon">🎨</div>
+            <div class="app-card-meta">
+              <h3>App Name Here</h3>
+              <span>app1.crowdshipped.dev</span>
+            </div>
+          </div>
+          <p>Short description of what the app does and why it's useful.</p>
+          <div class="app-card-footer">
+            <span class="app-card-author">Idea by <strong>@username</strong></span>
+            <span class="app-card-tag">LIVE</span>
+          </div>
+        </a>
+      </div>
+      ═══════════════════════════════════════════════
+      -->
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Got an app idea?</h2>
+        <p>Head to Instagram, drop your idea in the comments. First to 100 likes gets built. Can your idea survive the 21-day challenge?</p>
+        <a href="https://instagram.com/crowdshipped.dev" target="_blank" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          Follow @crowdshipped.dev
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CUSTOM SOLUTIONS -->
+  <section class="custom">
+    <div class="container">
+      <div class="custom-card">
+        <div class="custom-icon">💼</div>
+        <div class="custom-info">
+          <h3>Need a custom solution?</h3>
+          <p>Have a specific app, tool, or web project in mind? I also build custom solutions for businesses and individuals. Skip the queue — let's talk about your project directly.</p>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;flex-shrink:0;">
+          <a href="mailto:contact@crowdshipped.dev" class="btn-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Email Me
+          </a>
+          <a href="https://instagram.com/crowdshipped.dev" target="_blank" class="btn-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            DM on IG
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>
+        Built with ☕ by <a href="https://instagram.com/crowdshipped.dev" target="_blank">@crowdshipped.dev</a>
+        &nbsp;·&nbsp; <a href="mailto:contact@crowdshipped.dev">contact@crowdshipped.dev</a>
+        &nbsp;·&nbsp; Hosted on <a href="https://pages.cloudflare.com" target="_blank">Cloudflare Pages</a>
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

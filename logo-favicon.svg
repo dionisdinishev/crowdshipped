@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="fbg" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#1a1530"/>
+      <stop offset="100%" stop-color="#0c0c14"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#fbg)"/>
+  <text x="256" y="285" text-anchor="middle" font-family="'Outfit','Helvetica Neue',sans-serif" font-weight="700" font-size="165">
+    <tspan fill="#7f3eff">&lt;</tspan><tspan font-family="'Geist Mono','JetBrains Mono','SF Mono',monospace" fill="#f0f0f5">CS</tspan><tspan fill="#e581ff">/&gt;</tspan>
+  </text>
+</svg>
